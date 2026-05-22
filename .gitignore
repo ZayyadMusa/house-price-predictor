@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+.env
+venv/
+.venv/
+
+# model and data files - too large for git
+backend/saved_model/
+backend/data/
+
+# jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# os
+.DS_Store
+Thumbs.db
+.vscode/
