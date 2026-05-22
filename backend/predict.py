@@ -25,7 +25,7 @@ def predict_price(model, encoder, feature_cols: list, input_data: dict) -> dict:
     appreciation = CITY_APPRECIATION.get(city, 0.10)
 
     projections = []
-    for year in range(1, 6):
+    for year in range(1, 11):
         projected = current_price * ((1 + appreciation) ** year)
         profit = projected - current_price
         projections.append({
