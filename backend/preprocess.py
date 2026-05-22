@@ -20,6 +20,43 @@ PROPERTY_TYPES = [
     "Penthouse",
 ]
 
+# area multipliers relative to the city average
+# e.g. Maitama is 2.5x more expensive than an average Abuja listing
+CITY_AREAS = {
+    "Abuja": {
+        "Maitama":                  2.5,
+        "Asokoro":                  2.2,
+        "Wuse 2":                   1.8,
+        "Jabi":                     1.6,
+        "Katampe":                  1.5,
+        "Utako":                    1.3,
+        "Gwarinpa":                 1.2,
+        "Central Business District":1.1,
+        "Wuse":                     1.0,
+        "Garki":                    1.0,
+        "Gudu":                     0.9,
+        "Lokogoma":                 0.8,
+        "Kubwa":                    0.7,
+        "Lugbe":                    0.65,
+        "Galadimawa":               0.6,
+        "Nyanya":                   0.55,
+    },
+    "Port Harcourt": {
+        "GRA Phase 1":    2.3,
+        "GRA Phase 2":    2.0,
+        "Old GRA":        1.8,
+        "Peter Odili":    1.5,
+        "Rumuola":        1.2,
+        "Eliozu":         1.1,
+        "Trans Amadi":    1.0,
+        "Rumuokwuta":     0.9,
+        "Diobu":          0.8,
+        "Mile 1":         0.75,
+        "Mile 3":         0.7,
+        "Rukpokwu":       0.65,
+    },
+}
+
 
 def load_and_clean(filepath: str) -> pd.DataFrame:
     df = pd.read_csv(filepath)
