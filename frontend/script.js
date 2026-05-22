@@ -1,65 +1,72 @@
 const API = "http://127.0.0.1:8000";
 
 let allAreas = {};
+let results = { a: null, b: null };
 
 async function loadOptions() {
   try {
     const res = await fetch(`${API}/options`);
     const data = await res.json();
-
     allAreas = data.areas;
 
-    const citySelect = document.getElementById("city");
-    data.cities.forEach(c => {
-      citySelect.innerHTML += `<option value="${c}">${c}</option>`;
+    ["a", "b"].forEach(p => {
+      const citySelect = document.getElementById(`${p}-city`);
+      data.cities.forEach(c => {
+        citySelect.innerHTML += `<option value="${c}">${c}</option>`;
+      });
+
+      const typeSelect = document.getElementById(`${p}-property_type`);
+      data.property_types.forEach(t => {
+        typeSelect.innerHTML += `<option value="${t}">${t}</option>`;
+      });
+
+      populateAreas(p, citySelect.value);
     });
 
-    const typeSelect = document.getElementById("property_type");
-    data.property_types.forEach(t => {
-      typeSelect.innerHTML += `<option value="${t}">${t}</option>`;
-    });
+    // default property B to a different city so the comparison is interesting
+    const bCity = document.getElementById("b-city");
+    if (bCity.options.length > 1) {
+      bCity.selectedIndex = 1;
+      populateAreas("b", bCity.value);
+    }
 
-    // populate areas for the default city on load
-    populateAreas(citySelect.value);
   } catch {
     showError("Can't reach the API - make sure the server is running.");
   }
 }
 
-function onCityChange() {
-  const city = document.getElementById("city").value;
-  populateAreas(city);
+function onCityChange(p) {
+  const city = document.getElementById(`${p}-city`).value;
+  populateAreas(p, city);
 }
 
-function populateAreas(city) {
-  const areaSelect = document.getElementById("area");
+function populateAreas(p, city) {
+  const areaSelect = document.getElementById(`${p}-area`);
   areaSelect.innerHTML = "";
-
   const areas = allAreas[city] || {};
-  // sort by multiplier descending so most expensive areas appear first
-  const sorted = Object.entries(areas).sort((a, b) => b[1] - a[1]);
-
-  sorted.forEach(([name]) => {
-    areaSelect.innerHTML += `<option value="${name}">${name}</option>`;
-  });
+  // most expensive areas first
+  Object.entries(areas)
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([name]) => {
+      areaSelect.innerHTML += `<option value="${name}">${name}</option>`;
+    });
 }
 
-async function predict() {
-  hideCards();
-
-  const payload = {
-    city: document.getElementById("city").value,
-    area: document.getElementById("area").value,
-    property_type: document.getElementById("property_type").value,
-    bedrooms: parseInt(document.getElementById("bedrooms").value),
-    bathrooms: parseInt(document.getElementById("bathrooms").value),
-    toilets: parseInt(document.getElementById("toilets").value),
-    parking_space: parseInt(document.getElementById("parking_space").value),
-  };
-
-  const btn = document.getElementById("predict-btn");
+async function predictSingle(p) {
+  const btn = document.getElementById(`${p}-btn`);
   btn.disabled = true;
   btn.textContent = "Predicting...";
+  hideError();
+
+  const payload = {
+    city:          document.getElementById(`${p}-city`).value,
+    area:          document.getElementById(`${p}-area`).value,
+    property_type: document.getElementById(`${p}-property_type`).value,
+    bedrooms:      parseInt(document.getElementById(`${p}-bedrooms`).value),
+    bathrooms:     parseInt(document.getElementById(`${p}-bathrooms`).value),
+    toilets:       parseInt(document.getElementById(`${p}-toilets`).value),
+    parking_space: parseInt(document.getElementById(`${p}-parking_space`).value),
+  };
 
   try {
     const res = await fetch(`${API}/predict`, {
@@ -73,16 +80,128 @@ async function predict() {
       throw new Error(err.detail || "Server error");
     }
 
-    const data = await res.json();
-    showResult(data);
+    results[p] = await res.json();
+    refreshResults();
   } catch (err) {
     showError(err.message === "Failed to fetch"
       ? "Can't reach the API - make sure the server is running."
       : err.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = "Predict Price";
+    btn.textContent = p === "a" ? "Predict Property A" : "Predict Property B";
   }
+}
+
+function onYearChange() {
+  const year = parseInt(document.getElementById("year-slider").value);
+  document.getElementById("year-label").textContent = `${year} year${year > 1 ? "s" : ""}`;
+  refreshResults();
+}
+
+function refreshResults() {
+  const hasAny = results.a || results.b;
+  document.getElementById("results-section").hidden = !hasAny;
+  if (!hasAny) return;
+
+  const year = parseInt(document.getElementById("year-slider").value);
+  renderSummary(year);
+  drawChart(year);
+}
+
+function getProjection(data, year) {
+  return data.projections.find(p => p.year === year) || data.projections[data.projections.length - 1];
+}
+
+function renderSummary(year) {
+  const grid = document.getElementById("summary-grid");
+  grid.innerHTML = "";
+
+  ["a", "b"].forEach(p => {
+    const data = results[p];
+    const card = document.createElement("div");
+
+    if (!data) {
+      card.className = "summary-card pending";
+      card.innerHTML = `
+        <div class="prop-tag">Property ${p.toUpperCase()}</div>
+        <p class="pending-msg">Fill in the form above and click Predict.</p>`;
+    } else {
+      const proj = getProjection(data, year);
+      card.className = `summary-card prop-${p}`;
+      card.innerHTML = `
+        <div class="prop-tag">Property ${p.toUpperCase()}</div>
+        <div class="location">${data.area}, ${data.city}</div>
+        <div class="price-row">
+          <span class="price-label">Buy now</span>
+          <span class="price-value">${formatNaira(data.buy_price)}</span>
+        </div>
+        <div class="price-row">
+          <span class="price-label">Sell in ${year} yr${year > 1 ? "s" : ""}</span>
+          <span class="price-value">${formatNaira(proj.projected_price)}</span>
+        </div>
+        <span class="roi-badge">+${proj.roi_percent}% ROI</span>`;
+    }
+
+    grid.appendChild(card);
+  });
+}
+
+function drawChart(selectedYear) {
+  const traces = [];
+  const allYears = Array.from({ length: 10 }, (_, i) => i + 1);
+  const xLabels = ["Now", ...allYears.map(y => `Yr ${y}`)];
+
+  const colors = { a: "#16a34a", b: "#2563eb" };
+
+  ["a", "b"].forEach(p => {
+    if (!results[p]) return;
+    const data = results[p];
+    const prices = [data.buy_price, ...allYears.map(y => getProjection(data, y).projected_price)];
+
+    traces.push({
+      x: xLabels,
+      y: prices,
+      type: "scatter",
+      mode: "lines+markers",
+      name: `Property ${p.toUpperCase()} — ${data.area}, ${data.city}`,
+      line: { color: colors[p], width: 3 },
+      marker: { size: 7, color: colors[p] },
+    });
+  });
+
+  // vertical line marking the selected year
+  const selectedX = `Yr ${selectedYear}`;
+  const shapes = [{
+    type: "line",
+    x0: selectedX, x1: selectedX,
+    y0: 0, y1: 1,
+    yref: "paper",
+    line: { color: "#f59e0b", width: 2, dash: "dot" },
+  }];
+
+  const annotations = [{
+    x: selectedX,
+    y: 1,
+    yref: "paper",
+    text: `Year ${selectedYear}`,
+    showarrow: false,
+    font: { color: "#f59e0b", size: 12, family: "Segoe UI, system-ui, sans-serif" },
+    yanchor: "bottom",
+  }];
+
+  const layout = {
+    margin: { t: 30, r: 30, b: 60, l: 80 },
+    legend: { orientation: "h", y: -0.2, x: 0.5, xanchor: "center" },
+    yaxis: { title: "Value (₦)", tickformat: ",.0f", gridcolor: "#f1f5f9" },
+    plot_bgcolor: "#fff",
+    paper_bgcolor: "#fff",
+    font: { family: "Segoe UI, system-ui, sans-serif", size: 13 },
+    height: 460,
+    shapes,
+    annotations,
+  };
+
+  Plotly.newPlot("chart", traces, layout, { responsive: true, displayModeBar: false });
 }
 
 function formatNaira(amount) {
@@ -91,76 +210,12 @@ function formatNaira(amount) {
   return `₦${amount.toLocaleString()}`;
 }
 
-function showResult(data) {
-  const card = document.getElementById("result-card");
-  const last = data.projections[data.projections.length - 1];
-
-  document.getElementById("buy-price").textContent = formatNaira(data.buy_price);
-  document.getElementById("area-tag").textContent = `${data.area}, ${data.city}`;
-  document.getElementById("sell-price").textContent = formatNaira(last.projected_price);
-  document.getElementById("roi").textContent = `+${last.roi_percent}% ROI over 5 years`;
-  document.getElementById("appreciation-note").textContent =
-    `Projection uses a ${data.appreciation_rate_used} based on historical ${data.city} property market data.`;
-
-  drawChart(data);
-  card.hidden = false;
-}
-
-function drawChart(data) {
-  const years = data.projections.map(p => `Year ${p.year}`);
-  const prices = data.projections.map(p => p.projected_price);
-  const profits = data.projections.map(p => p.profit);
-
-  const trace1 = {
-    x: ["Now", ...years],
-    y: [data.buy_price, ...prices],
-    type: "scatter",
-    mode: "lines+markers",
-    name: "Projected value (₦)",
-    line: { color: "#16a34a", width: 3 },
-    marker: { size: 9, color: "#16a34a" },
-  };
-
-  const trace2 = {
-    x: years,
-    y: profits,
-    type: "bar",
-    name: "Profit vs buy price (₦)",
-    marker: { color: "#bbf7d0", line: { color: "#16a34a", width: 1 } },
-    yaxis: "y2",
-  };
-
-  const layout = {
-    margin: { t: 30, r: 80, b: 50, l: 80 },
-    legend: { orientation: "h", y: -0.18, x: 0.5, xanchor: "center" },
-    yaxis: {
-      title: "Property Value (₦)",
-      tickformat: ",.0f",
-      gridcolor: "#f1f5f9",
-    },
-    yaxis2: {
-      title: "Profit (₦)",
-      overlaying: "y",
-      side: "right",
-      tickformat: ",.0f",
-      gridcolor: "#f1f5f9",
-    },
-    plot_bgcolor: "#fff",
-    paper_bgcolor: "#fff",
-    font: { family: "Segoe UI, system-ui, sans-serif", size: 13 },
-    height: 420,
-  };
-
-  Plotly.newPlot("chart", [trace1, trace2], layout, { responsive: true, displayModeBar: false });
-}
-
 function showError(msg) {
   document.getElementById("error-msg").textContent = msg;
   document.getElementById("error-card").hidden = false;
 }
 
-function hideCards() {
-  document.getElementById("result-card").hidden = true;
+function hideError() {
   document.getElementById("error-card").hidden = true;
 }
 

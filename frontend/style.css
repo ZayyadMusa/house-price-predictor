@@ -7,6 +7,8 @@
 :root {
   --green: #16a34a;
   --green-light: #f0fdf4;
+  --blue: #2563eb;
+  --blue-light: #eff6ff;
   --accent: #1d6f42;
   --accent-hover: #155736;
   --border: #e2e8f0;
@@ -24,7 +26,7 @@ body {
 }
 
 .container {
-  max-width: 820px;
+  max-width: 860px;
   margin: 0 auto;
 }
 
@@ -33,15 +35,29 @@ header {
   margin-bottom: 2rem;
 }
 
-header h1 {
-  font-size: 1.9rem;
-  font-weight: 700;
-}
+header h1 { font-size: 1.9rem; font-weight: 700; }
 
 .subtitle {
   color: var(--muted);
   margin-top: 0.4rem;
   font-size: 0.95rem;
+}
+
+.section-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.section-note {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.82rem;
 }
 
 .card {
@@ -68,7 +84,7 @@ header h1 {
 
 label {
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -88,9 +104,7 @@ input[type="number"] {
 }
 
 select:focus,
-input[type="number"]:focus {
-  border-color: var(--accent);
-}
+input[type="number"]:focus { border-color: var(--accent); }
 
 button {
   width: 100%;
@@ -108,69 +122,97 @@ button {
 button:hover { background: var(--accent-hover); }
 button:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* result card */
-.result-top {
+/* year slider */
+.slider-card { padding: 1.25rem 1.75rem; }
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.slider-row label {
+  white-space: nowrap;
+  font-size: 0.88rem;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text);
+  font-weight: 600;
+}
+
+input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+  height: 6px;
+  cursor: pointer;
+}
+
+#year-label {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--accent);
+  min-width: 60px;
+}
+
+/* summary cards */
+.summary-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1.25rem;
 }
 
-.price-block {
-  background: #f8fafc;
+.summary-card {
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1rem 1.25rem;
 }
 
-.price-block.highlight {
-  background: var(--green-light);
-  border-color: #bbf7d0;
-}
+.summary-card.prop-a { background: var(--green-light); border-color: #bbf7d0; }
+.summary-card.prop-b { background: var(--blue-light); border-color: #bfdbfe; }
+.summary-card.pending { background: #f8fafc; }
 
-.price-block .label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--muted);
+.summary-card .prop-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.4rem;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
 }
 
-.price-block .price {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--text);
+.prop-a .prop-tag { color: var(--green); }
+.prop-b .prop-tag { color: var(--blue); }
+
+.summary-card .location { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text); }
+
+.summary-card .price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.3rem;
 }
 
-.price-block.highlight .price {
-  color: var(--green);
-}
+.summary-card .price-label { font-size: 0.78rem; color: var(--muted); }
+.summary-card .price-value { font-size: 1.1rem; font-weight: 800; }
+.prop-a .price-value { color: var(--green); }
+.prop-b .price-value { color: var(--blue); }
 
-.area-tag {
-  font-size: 0.82rem;
-  color: var(--muted);
-  margin-top: 0.3rem;
-}
-
-.roi {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--green);
-  margin-top: 0.25rem;
-}
-
-.disclaimer {
+.summary-card .roi-badge {
+  display: inline-block;
+  margin-top: 0.5rem;
   font-size: 0.8rem;
-  color: var(--muted);
-  margin-bottom: 1.25rem;
-  font-style: italic;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
 }
 
-#chart {
-  width: 100%;
-  height: 420px;
-}
+.prop-a .roi-badge { background: #dcfce7; color: var(--green); }
+.prop-b .roi-badge { background: #dbeafe; color: var(--blue); }
+
+.pending-msg { color: var(--muted); font-size: 0.88rem; margin-top: 0.5rem; }
+
+/* chart */
+#chart { width: 100%; height: 460px; }
 
 /* error */
 .error-card {
@@ -180,7 +222,7 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   font-weight: 500;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 560px) {
   .form-grid { grid-template-columns: 1fr; }
-  .result-top { grid-template-columns: 1fr; }
+  .summary-grid { grid-template-columns: 1fr; }
 }

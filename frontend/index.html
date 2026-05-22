@@ -11,71 +11,109 @@
   <div class="container">
     <header>
       <h1>Nigeria House Price Predictor</h1>
-      <p class="subtitle">Abuja &amp; Port Harcourt — buy price + 5-year sell projection</p>
+      <p class="subtitle">Abuja &amp; Port Harcourt — buy price + sell projection</p>
     </header>
 
     <main>
+
+      <!-- PROPERTY A -->
+      <div class="section-label">Property A</div>
       <div class="card form-card">
         <div class="form-grid">
           <div class="field">
-            <label for="city">City</label>
-            <select id="city" onchange="onCityChange()"></select>
+            <label for="a-city">City</label>
+            <select id="a-city" title="City" onchange="onCityChange('a')"></select>
           </div>
-
           <div class="field">
-            <label for="area">Area / Neighbourhood</label>
-            <select id="area"></select>
+            <label for="a-area">Area / Neighbourhood</label>
+            <select id="a-area" title="Area"></select>
           </div>
-
           <div class="field">
-            <label for="property_type">Property type</label>
-            <select id="property_type"></select>
+            <label for="a-property_type">Property type</label>
+            <select id="a-property_type" title="Property type"></select>
           </div>
-
           <div class="field">
-            <label for="bedrooms">Bedrooms</label>
-            <input type="number" id="bedrooms" min="1" max="10" value="3" />
+            <label for="a-bedrooms">Bedrooms</label>
+            <input type="number" id="a-bedrooms" title="Bedrooms" min="1" max="10" value="3" />
           </div>
-
           <div class="field">
-            <label for="bathrooms">Bathrooms</label>
-            <input type="number" id="bathrooms" min="1" max="10" value="2" />
+            <label for="a-bathrooms">Bathrooms</label>
+            <input type="number" id="a-bathrooms" title="Bathrooms" min="1" max="10" value="2" />
           </div>
-
           <div class="field">
-            <label for="toilets">Toilets</label>
-            <input type="number" id="toilets" min="1" max="10" value="3" />
+            <label for="a-toilets">Toilets</label>
+            <input type="number" id="a-toilets" title="Toilets" min="1" max="10" value="3" />
           </div>
-
           <div class="field">
-            <label for="parking_space">Parking spaces</label>
-            <input type="number" id="parking_space" min="0" max="10" value="1" />
+            <label for="a-parking_space">Parking spaces</label>
+            <input type="number" id="a-parking_space" title="Parking spaces" min="0" max="10" value="1" />
           </div>
         </div>
-
-        <button type="button" id="predict-btn" onclick="predict()">Predict Price</button>
+        <button type="button" id="a-btn" onclick="predictSingle('a')">Predict Property A</button>
       </div>
 
-      <div class="card result-card" id="result-card" hidden>
-        <div class="result-top">
-          <div class="price-block">
-            <p class="label">Buy now (estimated)</p>
-            <p class="price" id="buy-price"></p>
-            <p class="area-tag" id="area-tag"></p>
+      <!-- PROPERTY B -->
+      <div class="section-label">
+        Property B
+        <span class="section-note">— compare against Property A</span>
+      </div>
+      <div class="card form-card">
+        <div class="form-grid">
+          <div class="field">
+            <label for="b-city">City</label>
+            <select id="b-city" title="City" onchange="onCityChange('b')"></select>
           </div>
-          <div class="price-block highlight">
-            <p class="label">Sell in 5 years (projected)</p>
-            <p class="price" id="sell-price"></p>
-            <p class="roi" id="roi"></p>
+          <div class="field">
+            <label for="b-area">Area / Neighbourhood</label>
+            <select id="b-area" title="Area"></select>
+          </div>
+          <div class="field">
+            <label for="b-property_type">Property type</label>
+            <select id="b-property_type" title="Property type"></select>
+          </div>
+          <div class="field">
+            <label for="b-bedrooms">Bedrooms</label>
+            <input type="number" id="b-bedrooms" title="Bedrooms" min="1" max="10" value="3" />
+          </div>
+          <div class="field">
+            <label for="b-bathrooms">Bathrooms</label>
+            <input type="number" id="b-bathrooms" title="Bathrooms" min="1" max="10" value="2" />
+          </div>
+          <div class="field">
+            <label for="b-toilets">Toilets</label>
+            <input type="number" id="b-toilets" title="Toilets" min="1" max="10" value="3" />
+          </div>
+          <div class="field">
+            <label for="b-parking_space">Parking spaces</label>
+            <input type="number" id="b-parking_space" title="Parking spaces" min="0" max="10" value="1" />
           </div>
         </div>
-        <p class="disclaimer" id="appreciation-note"></p>
-        <div id="chart"></div>
+        <button type="button" id="b-btn" onclick="predictSingle('b')">Predict Property B</button>
       </div>
 
       <div class="card error-card" id="error-card" hidden>
         <p id="error-msg"></p>
       </div>
+
+      <!-- RESULTS -->
+      <div id="results-section" hidden>
+
+        <div class="card slider-card">
+          <div class="slider-row">
+            <label for="year-slider">Sell after</label>
+            <input type="range" id="year-slider" title="Years" min="1" max="10" value="5" oninput="onYearChange()" />
+            <span id="year-label">5 years</span>
+          </div>
+        </div>
+
+        <div class="summary-grid" id="summary-grid"></div>
+
+        <div class="card">
+          <div id="chart"></div>
+        </div>
+
+      </div>
+
     </main>
   </div>
 
