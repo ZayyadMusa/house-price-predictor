@@ -2,7 +2,7 @@
 
 I built this as part of my MSc AI portfolio. The idea came from actually living between Abuja and Port Harcourt and having no real way to estimate what a property is worth or whether it's a good investment. Most tools online are either too generic or don't cover Nigeria at all, so I built one that does.
 
-You enter the details of a property — city, type, bedrooms, bathrooms — and it gives you an estimated buy price based on real Nigerian listing data, plus a projected sell value for each of the next 5 years so you can see whether the investment makes sense.
+You enter the details of a property — city, type, bedrooms, bathrooms — and it gives you an estimated buy price based on real Nigerian listing data, plus a projected sell value for each of the next 10 years so you can see whether the investment makes sense.
 
 ---
 
