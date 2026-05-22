@@ -7,8 +7,9 @@ import joblib
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Optional
 
-from preprocess import CITIES, PROPERTY_TYPES
+from preprocess import CITIES, PROPERTY_TYPES, CITY_AREAS
 from predict import predict_price
 
 app = FastAPI(title="Nigeria House Price Predictor", version="1.0")
@@ -40,6 +41,7 @@ def get_model():
 
 class HouseInput(BaseModel):
     city: str
+    area: Optional[str] = None
     property_type: str
     bedrooms: int
     bathrooms: int
@@ -55,7 +57,11 @@ def health():
 @app.get("/options")
 def options():
     # frontend uses this to populate the dropdowns
-    return {"cities": CITIES, "property_types": PROPERTY_TYPES}
+    return {
+        "cities": CITIES,
+        "property_types": PROPERTY_TYPES,
+        "areas": CITY_AREAS,
+    }
 
 
 @app.post("/predict")
