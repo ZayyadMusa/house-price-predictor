@@ -9,7 +9,7 @@ You enter the details of a property — city, type, bedrooms, bathrooms — and 
 ## What it does
 
 - Predicts the current market price of a house in **Abuja** or **Port Harcourt**
-- Shows a **5-year sell projection** with expected profit and ROI
+- Shows a **10-year sell projection** with expected profit and ROI
 - Plots a chart so you can see how the value grows year by year
 - Built on a dataset of real Nigerian property listings from PropertyPro.ng
 
