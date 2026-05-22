@@ -2,6 +2,25 @@ const API = "http://127.0.0.1:8000";
 
 let allAreas = {};
 let results = { a: null, b: null };
+let comparing = false;
+
+function toggleCompare() {
+  comparing = !comparing;
+
+  const colB = document.getElementById("col-b");
+  const wrapper = document.getElementById("forms-wrapper");
+  const toggle = document.getElementById("compare-toggle");
+
+  colB.hidden = !comparing;
+  wrapper.classList.toggle("comparing", comparing);
+  document.getElementById("main-container").classList.toggle("wide", comparing);
+  toggle.textContent = comparing ? "− Hide comparison" : "+ Compare with another property";
+
+  if (!comparing) {
+    results.b = null;
+    refreshResults();
+  }
+}
 
 async function loadOptions() {
   try {
@@ -116,7 +135,11 @@ function renderSummary(year) {
   const grid = document.getElementById("summary-grid");
   grid.innerHTML = "";
 
-  ["a", "b"].forEach(p => {
+  // only show B card if comparison mode is on
+  const props = comparing ? ["a", "b"] : ["a"];
+  grid.style.gridTemplateColumns = comparing ? "1fr 1fr" : "1fr";
+
+  props.forEach(p => {
     const data = results[p];
     const card = document.createElement("div");
 

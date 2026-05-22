@@ -8,7 +8,7 @@
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="main-container">
     <header>
       <h1>Nigeria House Price Predictor</h1>
       <p class="subtitle">Abuja &amp; Port Harcourt — buy price + sell projection</p>
@@ -16,79 +16,91 @@
 
     <main>
 
-      <!-- PROPERTY A -->
-      <div class="section-label">Property A</div>
-      <div class="card form-card">
-        <div class="form-grid">
-          <div class="field">
-            <label for="a-city">City</label>
-            <select id="a-city" title="City" onchange="onCityChange('a')"></select>
-          </div>
-          <div class="field">
-            <label for="a-area">Area / Neighbourhood</label>
-            <select id="a-area" title="Area"></select>
-          </div>
-          <div class="field">
-            <label for="a-property_type">Property type</label>
-            <select id="a-property_type" title="Property type"></select>
-          </div>
-          <div class="field">
-            <label for="a-bedrooms">Bedrooms</label>
-            <input type="number" id="a-bedrooms" title="Bedrooms" min="1" max="10" value="3" />
-          </div>
-          <div class="field">
-            <label for="a-bathrooms">Bathrooms</label>
-            <input type="number" id="a-bathrooms" title="Bathrooms" min="1" max="10" value="2" />
-          </div>
-          <div class="field">
-            <label for="a-toilets">Toilets</label>
-            <input type="number" id="a-toilets" title="Toilets" min="1" max="10" value="3" />
-          </div>
-          <div class="field">
-            <label for="a-parking_space">Parking spaces</label>
-            <input type="number" id="a-parking_space" title="Parking spaces" min="0" max="10" value="1" />
-          </div>
-        </div>
-        <button type="button" id="a-btn" onclick="predictSingle('a')">Predict Property A</button>
+      <!-- compare toggle bar -->
+      <div class="toolbar">
+        <button type="button" class="compare-toggle" id="compare-toggle" onclick="toggleCompare()">
+          <span id="toggle-icon">＋</span> Compare with another property
+        </button>
       </div>
 
-      <!-- PROPERTY B -->
-      <div class="section-label">
-        Property B
-        <span class="section-note">— compare against Property A</span>
-      </div>
-      <div class="card form-card">
-        <div class="form-grid">
-          <div class="field">
-            <label for="b-city">City</label>
-            <select id="b-city" title="City" onchange="onCityChange('b')"></select>
-          </div>
-          <div class="field">
-            <label for="b-area">Area / Neighbourhood</label>
-            <select id="b-area" title="Area"></select>
-          </div>
-          <div class="field">
-            <label for="b-property_type">Property type</label>
-            <select id="b-property_type" title="Property type"></select>
-          </div>
-          <div class="field">
-            <label for="b-bedrooms">Bedrooms</label>
-            <input type="number" id="b-bedrooms" title="Bedrooms" min="1" max="10" value="3" />
-          </div>
-          <div class="field">
-            <label for="b-bathrooms">Bathrooms</label>
-            <input type="number" id="b-bathrooms" title="Bathrooms" min="1" max="10" value="2" />
-          </div>
-          <div class="field">
-            <label for="b-toilets">Toilets</label>
-            <input type="number" id="b-toilets" title="Toilets" min="1" max="10" value="3" />
-          </div>
-          <div class="field">
-            <label for="b-parking_space">Parking spaces</label>
-            <input type="number" id="b-parking_space" title="Parking spaces" min="0" max="10" value="1" />
+      <div class="forms-wrapper" id="forms-wrapper">
+
+        <!-- PROPERTY A -->
+        <div class="form-column" id="col-a">
+          <div class="section-label prop-a-label">Property A</div>
+          <div class="card form-card">
+            <div class="form-grid" id="a-grid">
+              <div class="field">
+                <label for="a-city">City</label>
+                <select id="a-city" title="City" onchange="onCityChange('a')"></select>
+              </div>
+              <div class="field">
+                <label for="a-area">Area / Neighbourhood</label>
+                <select id="a-area" title="Area"></select>
+              </div>
+              <div class="field">
+                <label for="a-property_type">Property type</label>
+                <select id="a-property_type" title="Property type"></select>
+              </div>
+              <div class="field">
+                <label for="a-bedrooms">Bedrooms</label>
+                <input type="number" id="a-bedrooms" title="Bedrooms" min="1" max="10" value="3" />
+              </div>
+              <div class="field">
+                <label for="a-bathrooms">Bathrooms</label>
+                <input type="number" id="a-bathrooms" title="Bathrooms" min="1" max="10" value="2" />
+              </div>
+              <div class="field">
+                <label for="a-toilets">Toilets</label>
+                <input type="number" id="a-toilets" title="Toilets" min="1" max="10" value="3" />
+              </div>
+              <div class="field">
+                <label for="a-parking_space">Parking spaces</label>
+                <input type="number" id="a-parking_space" title="Parking spaces" min="0" max="10" value="1" />
+              </div>
+            </div>
+            <button type="button" id="a-btn" onclick="predictSingle('a')">Predict Price</button>
           </div>
         </div>
-        <button type="button" id="b-btn" onclick="predictSingle('b')">Predict Property B</button>
+
+        <!-- PROPERTY B — hidden until toggled -->
+        <div class="form-column" id="col-b" hidden>
+          <div class="section-label prop-b-label">Property B</div>
+          <div class="card form-card">
+            <div class="form-grid" id="b-grid">
+              <div class="field">
+                <label for="b-city">City</label>
+                <select id="b-city" title="City" onchange="onCityChange('b')"></select>
+              </div>
+              <div class="field">
+                <label for="b-area">Area / Neighbourhood</label>
+                <select id="b-area" title="Area"></select>
+              </div>
+              <div class="field">
+                <label for="b-property_type">Property type</label>
+                <select id="b-property_type" title="Property type"></select>
+              </div>
+              <div class="field">
+                <label for="b-bedrooms">Bedrooms</label>
+                <input type="number" id="b-bedrooms" title="Bedrooms" min="1" max="10" value="3" />
+              </div>
+              <div class="field">
+                <label for="b-bathrooms">Bathrooms</label>
+                <input type="number" id="b-bathrooms" title="Bathrooms" min="1" max="10" value="2" />
+              </div>
+              <div class="field">
+                <label for="b-toilets">Toilets</label>
+                <input type="number" id="b-toilets" title="Toilets" min="1" max="10" value="3" />
+              </div>
+              <div class="field">
+                <label for="b-parking_space">Parking spaces</label>
+                <input type="number" id="b-parking_space" title="Parking spaces" min="0" max="10" value="1" />
+              </div>
+            </div>
+            <button type="button" id="b-btn" onclick="predictSingle('b')">Predict Price</button>
+          </div>
+        </div>
+
       </div>
 
       <div class="card error-card" id="error-card" hidden>
@@ -97,7 +109,6 @@
 
       <!-- RESULTS -->
       <div id="results-section" hidden>
-
         <div class="card slider-card">
           <div class="slider-row">
             <label for="year-slider">Sell after</label>
@@ -111,7 +122,6 @@
         <div class="card">
           <div id="chart"></div>
         </div>
-
       </div>
 
     </main>

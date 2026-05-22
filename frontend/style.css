@@ -32,6 +32,11 @@ body {
   max-width: 880px;
   margin: 0 auto;
   padding: 0 1.25rem;
+  transition: max-width 0.35s ease;
+}
+
+.container.wide {
+  max-width: 1140px;
 }
 
 /* ── animated header ── */
@@ -92,6 +97,84 @@ header h1 {
   letter-spacing: 0;
   color: var(--muted);
   font-size: 0.82rem;
+}
+
+/* ── forms side by side ── */
+.forms-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 1.5rem;
+  transition: grid-template-columns 0.3s ease;
+}
+
+.forms-wrapper.comparing {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* collapse inner form to single column so fields aren't cramped at half width */
+.forms-wrapper.comparing .form-grid {
+  grid-template-columns: 1fr;
+}
+
+.form-column {
+  min-width: 0; /* prevents overflow in grid */
+}
+
+/* compare toggle button */
+.compare-toggle {
+  width: 100%;
+  padding: 0.65rem;
+  background: transparent;
+  color: var(--accent);
+  border: 2px dashed var(--green-mid);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  box-shadow: none;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  margin-bottom: 1.25rem;
+}
+
+.compare-toggle:hover {
+  background: var(--green-light);
+  border-color: var(--green);
+  transform: none;
+  box-shadow: none;
+}
+
+/* remove B button inside section label */
+.remove-btn {
+  width: auto;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: none;
+  letter-spacing: 0;
+  margin-left: auto;
+  transition: background 0.2s;
+}
+
+.remove-btn:hover {
+  background: #fca5a5;
+  transform: none;
+  box-shadow: none;
+}
+
+/* col-b slide in animation */
+#col-b {
+  animation: slideIn 0.35s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 /* ── cards ── */
@@ -348,7 +431,6 @@ input[type="range"]:focus { box-shadow: none; border-color: transparent; }
   color: #92400e;
   font-weight: 600;
   animation: shake 0.4s ease;
-  will-change: transform;
 }
 
 @keyframes shake {
