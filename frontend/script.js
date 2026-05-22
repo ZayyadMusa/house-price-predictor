@@ -189,6 +189,8 @@ function drawChart(selectedYear) {
       name: `Property ${p.toUpperCase()} — ${data.area}, ${data.city}`,
       line: { color: colors[p], width: 3 },
       marker: { size: 7, color: colors[p] },
+      hovertemplate: "<b>%{x}</b><br>%{customdata}<extra>Prop " + p.toUpperCase() + "</extra>",
+      customdata: prices.map(v => formatNaira(v)),
     });
   });
 
@@ -215,7 +217,7 @@ function drawChart(selectedYear) {
   const layout = {
     margin: { t: 30, r: 30, b: 60, l: 80 },
     legend: { orientation: "h", y: -0.2, x: 0.5, xanchor: "center" },
-    yaxis: { title: "Value (₦)", tickformat: ",.0f", gridcolor: "#f1f5f9" },
+    yaxis: { tickprefix: "₦", tickformat: ".3s", gridcolor: "#f1f5f9", automargin: true },
     plot_bgcolor: "#fff",
     paper_bgcolor: "#fff",
     font: { family: "Segoe UI, system-ui, sans-serif", size: 13 },
