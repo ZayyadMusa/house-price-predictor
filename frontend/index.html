@@ -19,7 +19,12 @@
         <div class="form-grid">
           <div class="field">
             <label for="city">City</label>
-            <select id="city"></select>
+            <select id="city" onchange="onCityChange()"></select>
+          </div>
+
+          <div class="field">
+            <label for="area">Area / Neighbourhood</label>
+            <select id="area"></select>
           </div>
 
           <div class="field">
@@ -56,6 +61,7 @@
           <div class="price-block">
             <p class="label">Buy now (estimated)</p>
             <p class="price" id="buy-price"></p>
+            <p class="area-tag" id="area-tag"></p>
           </div>
           <div class="price-block highlight">
             <p class="label">Sell in 5 years (projected)</p>

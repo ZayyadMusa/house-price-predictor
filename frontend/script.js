@@ -1,10 +1,13 @@
 const API = "http://127.0.0.1:8000";
 
-// load cities and property types from the API to populate dropdowns
+let allAreas = {};
+
 async function loadOptions() {
   try {
     const res = await fetch(`${API}/options`);
     const data = await res.json();
+
+    allAreas = data.areas;
 
     const citySelect = document.getElementById("city");
     data.cities.forEach(c => {
@@ -15,9 +18,30 @@ async function loadOptions() {
     data.property_types.forEach(t => {
       typeSelect.innerHTML += `<option value="${t}">${t}</option>`;
     });
+
+    // populate areas for the default city on load
+    populateAreas(citySelect.value);
   } catch {
     showError("Can't reach the API - make sure the server is running.");
   }
+}
+
+function onCityChange() {
+  const city = document.getElementById("city").value;
+  populateAreas(city);
+}
+
+function populateAreas(city) {
+  const areaSelect = document.getElementById("area");
+  areaSelect.innerHTML = "";
+
+  const areas = allAreas[city] || {};
+  // sort by multiplier descending so most expensive areas appear first
+  const sorted = Object.entries(areas).sort((a, b) => b[1] - a[1]);
+
+  sorted.forEach(([name]) => {
+    areaSelect.innerHTML += `<option value="${name}">${name}</option>`;
+  });
 }
 
 async function predict() {
@@ -25,6 +49,7 @@ async function predict() {
 
   const payload = {
     city: document.getElementById("city").value,
+    area: document.getElementById("area").value,
     property_type: document.getElementById("property_type").value,
     bedrooms: parseInt(document.getElementById("bedrooms").value),
     bathrooms: parseInt(document.getElementById("bathrooms").value),
@@ -71,6 +96,7 @@ function showResult(data) {
   const last = data.projections[data.projections.length - 1];
 
   document.getElementById("buy-price").textContent = formatNaira(data.buy_price);
+  document.getElementById("area-tag").textContent = `${data.area}, ${data.city}`;
   document.getElementById("sell-price").textContent = formatNaira(last.projected_price);
   document.getElementById("roi").textContent = `+${last.roi_percent}% ROI over 5 years`;
   document.getElementById("appreciation-note").textContent =
@@ -90,27 +116,39 @@ function drawChart(data) {
     y: [data.buy_price, ...prices],
     type: "scatter",
     mode: "lines+markers",
-    name: "Projected value",
+    name: "Projected value (₦)",
     line: { color: "#16a34a", width: 3 },
-    marker: { size: 8 },
+    marker: { size: 9, color: "#16a34a" },
   };
 
   const trace2 = {
     x: years,
     y: profits,
     type: "bar",
-    name: "Profit vs buy price",
-    marker: { color: "#bbf7d0" },
+    name: "Profit vs buy price (₦)",
+    marker: { color: "#bbf7d0", line: { color: "#16a34a", width: 1 } },
     yaxis: "y2",
   };
 
   const layout = {
-    margin: { t: 20, r: 60, b: 40, l: 60 },
-    legend: { orientation: "h", y: -0.2 },
-    yaxis: { title: "Value (₦)", tickformat: ",.0f" },
-    yaxis2: { title: "Profit (₦)", overlaying: "y", side: "right", tickformat: ",.0f" },
+    margin: { t: 30, r: 80, b: 50, l: 80 },
+    legend: { orientation: "h", y: -0.18, x: 0.5, xanchor: "center" },
+    yaxis: {
+      title: "Property Value (₦)",
+      tickformat: ",.0f",
+      gridcolor: "#f1f5f9",
+    },
+    yaxis2: {
+      title: "Profit (₦)",
+      overlaying: "y",
+      side: "right",
+      tickformat: ",.0f",
+      gridcolor: "#f1f5f9",
+    },
     plot_bgcolor: "#fff",
     paper_bgcolor: "#fff",
+    font: { family: "Segoe UI, system-ui, sans-serif", size: 13 },
+    height: 420,
   };
 
   Plotly.newPlot("chart", [trace1, trace2], layout, { responsive: true, displayModeBar: false });
