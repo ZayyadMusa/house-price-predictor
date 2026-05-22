@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nigeria House Price Predictor</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Nigeria House Price Predictor</h1>
+      <p class="subtitle">Abuja &amp; Port Harcourt — buy price + 5-year sell projection</p>
+    </header>
+
+    <main>
+      <div class="card form-card">
+        <div class="form-grid">
+          <div class="field">
+            <label for="city">City</label>
+            <select id="city"></select>
+          </div>
+
+          <div class="field">
+            <label for="property_type">Property type</label>
+            <select id="property_type"></select>
+          </div>
+
+          <div class="field">
+            <label for="bedrooms">Bedrooms</label>
+            <input type="number" id="bedrooms" min="1" max="10" value="3" />
+          </div>
+
+          <div class="field">
+            <label for="bathrooms">Bathrooms</label>
+            <input type="number" id="bathrooms" min="1" max="10" value="2" />
+          </div>
+
+          <div class="field">
+            <label for="toilets">Toilets</label>
+            <input type="number" id="toilets" min="1" max="10" value="3" />
+          </div>
+
+          <div class="field">
+            <label for="parking_space">Parking spaces</label>
+            <input type="number" id="parking_space" min="0" max="10" value="1" />
+          </div>
+        </div>
+
+        <button type="button" id="predict-btn" onclick="predict()">Predict Price</button>
+      </div>
+
+      <div class="card result-card" id="result-card" hidden>
+        <div class="result-top">
+          <div class="price-block">
+            <p class="label">Buy now (estimated)</p>
+            <p class="price" id="buy-price"></p>
+          </div>
+          <div class="price-block highlight">
+            <p class="label">Sell in 5 years (projected)</p>
+            <p class="price" id="sell-price"></p>
+            <p class="roi" id="roi"></p>
+          </div>
+        </div>
+        <p class="disclaimer" id="appreciation-note"></p>
+        <div id="chart"></div>
+      </div>
+
+      <div class="card error-card" id="error-card" hidden>
+        <p id="error-msg"></p>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
